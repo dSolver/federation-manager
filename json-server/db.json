@@ -1,0 +1,214 @@
+{
+  "projects": [
+    {
+      "id": "1426f900-8afc-4bbd-bf16-c21c906fa886",
+      "name": "test",
+      "stages": [
+        "beta",
+        "gamma",
+        "prod"
+      ],
+      "shared": [],
+      "packages": [
+        "801dd455-4f04-4d03-b09a-0bb455ad67c3"
+      ]
+    },
+    {
+      "id": "693dbac8-9a3a-40b0-815e-a074c2cbaf6c",
+      "name": "Second Project",
+      "stages": [
+        "beta",
+        "gamma",
+        "prod"
+      ],
+      "shared": [],
+      "packages": [
+        "34aaf59f-274e-4fad-ba80-ba133da50859",
+        "a6a44bdd-77ce-448d-9ef5-4a1217993372",
+        "9075b507-d5b7-481e-8128-5b6166d1a6c6",
+        "18584bdc-f602-465e-8ffc-d45e46c6959b",
+        "51666fcb-86ad-4ebf-ae98-a7c8579da585"
+      ]
+    },
+    {
+      "id": "f1d06912-8991-490c-a97c-7f063584de99",
+      "name": "ProjectZero",
+      "stages": [
+        "beta",
+        "gamma",
+        "prod"
+      ],
+      "shared": [
+        {
+          "name": "react-dom",
+          "requiredVersion": "^17.0.2",
+          "eager": true,
+          "singleton": true
+        },
+        {
+          "name": "react",
+          "requiredVersion": "^17.0.1",
+          "eager": true,
+          "singleton": true
+        }
+      ],
+      "packages": [
+        "33707199-b1f8-413e-a47e-4e06872d0495",
+        "aa6daa8d-525d-4a9d-9d7a-5751c1e08b58",
+        "317ae5fd-bede-46c8-8555-e11b4ea1ceba"
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "id": "34aaf59f-274e-4fad-ba80-ba133da50859",
+      "name": "TodoApp2",
+      "version": "0.0.1",
+      "modules": [
+        {
+          "name": "./NewTodoButton",
+          "path": "./src/components/NewTodoButton"
+        },
+        {
+          "name": "./TodoList",
+          "path": "./src/components/TodoList"
+        }
+      ],
+      "remotes": [
+        "18584bdc-f602-465e-8ffc-d45e46c6959b"
+      ],
+      "shared": [],
+      "stages": {
+        "beta": "https://beta-todo.awesome.app",
+        "gamma": "https://gamma-todo.awesome.app",
+        "prod": "https://todo.awesome.app"
+      }
+    },
+    {
+      "id": "a6a44bdd-77ce-448d-9ef5-4a1217993372",
+      "name": "TodoNotification",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [],
+      "shared": [],
+      "stages": {
+        "beta": "http://localhost:8081",
+        "gamma": "https://gamma.awesomeapp.todo",
+        "prod": "https://awesomeapp.todo"
+      }
+    },
+    {
+      "id": "9075b507-d5b7-481e-8128-5b6166d1a6c6",
+      "name": "Test",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [
+        "a6a44bdd-77ce-448d-9ef5-4a1217993372"
+      ],
+      "shared": [],
+      "stages": {}
+    },
+    {
+      "id": "18584bdc-f602-465e-8ffc-d45e46c6959b",
+      "name": "Foobar",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [
+        "a6a44bdd-77ce-448d-9ef5-4a1217993372",
+        "9075b507-d5b7-481e-8128-5b6166d1a6c6"
+      ],
+      "shared": [],
+      "stages": {}
+    },
+    {
+      "id": "51666fcb-86ad-4ebf-ae98-a7c8579da585",
+      "name": "AppHost",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [
+        "34aaf59f-274e-4fad-ba80-ba133da50859",
+        "a6a44bdd-77ce-448d-9ef5-4a1217993372"
+      ],
+      "shared": [],
+      "stages": {
+        "beta": "https://beta.awesome.app",
+        "gamma": "https://gamma.awesome.app",
+        "prod": "https://awesome.app"
+      }
+    },
+    {
+      "id": "801dd455-4f04-4d03-b09a-0bb455ad67c3",
+      "name": "testHostApp",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [],
+      "shared": [],
+      "stages": {
+        "beta": "https://beta-test.app",
+        "gamma": "https://gamma-test.app",
+        "prod": "https://test.app"
+      }
+    },
+    {
+      "id": "33707199-b1f8-413e-a47e-4e06872d0495",
+      "name": "ToolbeltPlatform",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [
+        "aa6daa8d-525d-4a9d-9d7a-5751c1e08b58",
+        "317ae5fd-bede-46c8-8555-e11b4ea1ceba"
+      ],
+      "shared": [],
+      "stages": {
+        "beta": "https://localhost:8080",
+        "gamma": "https://gamma.toolbelt.io",
+        "prod": "https://toolbelt.io"
+      }
+    },
+    {
+      "id": "aa6daa8d-525d-4a9d-9d7a-5751c1e08b58",
+      "name": "TodoNotification",
+      "version": "0.0.1",
+      "modules": [
+        {
+          "name": "./Notifications",
+          "path": "./src/Notifications"
+        }
+      ],
+      "remotes": [],
+      "shared": [
+        {
+          "name": "lodash",
+          "eager": false,
+          "singleton": false
+        }
+      ],
+      "stages": {
+        "beta": "http://localhost:8082",
+        "gamma": "https://gamma-todo-notification.toolbelt.io",
+        "prod": "https://todo-notification.toolbelt.io"
+      }
+    },
+    {
+      "id": "317ae5fd-bede-46c8-8555-e11b4ea1ceba",
+      "name": "TodoApp",
+      "version": "0.0.1",
+      "modules": [
+        {
+          "name": "./TodoApp",
+          "path": "./src/Todo"
+        }
+      ],
+      "remotes": [
+        "aa6daa8d-525d-4a9d-9d7a-5751c1e08b58"
+      ],
+      "shared": [],
+      "stages": {
+        "beta": "http://localhost:8081",
+        "gamma": "https://gamma-todo-app.toolbelt.io",
+        "prod": "https://todo-app.toolbelt.io"
+      }
+    }
+  ],
+  "modules": []
+}

@@ -1,24 +1,25 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { ProjectList } from './ProjectUI/ProjectList';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { ProjectPage } from './ProjectUI/ProjectPage';
+import { PackagePage } from './PackageUI/PackagePage';
+import { PackageEditor } from './PackageUI/PackageEditor';
+import { PackageEditorPage } from './PackageUI/PackageEditorPage';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <BrowserRouter>
+
+        <Routes>
+          <Route path="projects" element={<ProjectList />} />
+          <Route path="projects/:id" element={<ProjectPage />} />
+          <Route path="projects/:projectId/packages/:packageId" element={<PackagePage />} />
+          <Route path="projects/:projectId/packages/:packageId/edit" element={<PackageEditorPage />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
