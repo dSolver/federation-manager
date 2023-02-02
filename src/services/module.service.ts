@@ -6,11 +6,6 @@ export async function getModule(id: string) {
     return data as ExposedModule
 }
 
-export async function getModules(moduleIds: string[]) {
-    const { data } = await axiosInstance.get('/modules')
-    return data as ExposedModule[]
-}
-
 export async function updateModule(id: string, payload: ExposedModule) {
     const { data } = await axiosInstance.put(`/modules/${id}`, {
         ...payload
