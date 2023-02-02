@@ -7,9 +7,7 @@ export async function getPackage(id: string) {
 }
 
 export async function getPackages(packageIds: string[]) {
-    const query = packageIds.map(id => `id=${id}`).join('&')
-    const { data } = await axiosInstance.get(`/packages?${query}`)
-    return data as Package[]
+    return Promise.all(packageIds.map(id => getPackage(id)))
 }
 
 export async function updatePackage(id: string, payload: Package) {
