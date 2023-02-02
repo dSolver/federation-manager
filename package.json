@@ -2,9 +2,11 @@
   "name": "federation-manager",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:8100",
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@fontsource/roboto": "^4.5.8",
     "@monaco-editor/react": "^4.4.6",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.6",
@@ -33,7 +35,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "json-server": "json-server --watch json-server/db.json --port 8100",
+    "json-server": "json-server json-server/db.json --routes json-server/routes.json --port 8100",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

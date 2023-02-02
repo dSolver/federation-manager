@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Project } from '../models/Project'
 import { PackageList } from '../PackageUI/PackageList'
-import { getProject, updateProject } from '../services/project.service'
+import { getProject, isWatched, unwatch, updateProject, watch } from '../services/project.service'
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getPackage } from '../services/package.service'
@@ -13,21 +13,28 @@ import Editor from '@monaco-editor/react'
 import { DependenciesList } from '../dependencies/DependenciesList'
 import { Dependency } from '../models/Dependency'
 
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+
 export const ProjectPage = () => {
     const { id } = useParams()
 
     const [project, setProject] = useState<Project>()
     const [config, setConfig] = useState<string[]>([])
+
+    const [watching, setWatching] = useState<boolean>(false)
     useEffect(() => {
-        setProject(undefined)
-        getProject(id as string).then(setProject)
+        if (id) {
+            setProject(undefined)
+            getProject(id as string).then(setProject)
+            setWatching(isWatched(id as string))
+        }
     }, [id])
 
-    if (!project) {
+    if (!project || !id) {
         return <div>loading project {id}</div>
     }
 
-    const output = config.join('\n\n\n')
     return (
         <Stack spacing={2} data-component="ProjectPage">
             <Stack spacing={2} direction={"row"}>
@@ -35,6 +42,20 @@ export const ProjectPage = () => {
                     <ArrowBackIcon />
                 </IconButton>
                 <h1>{project.name}</h1>
+                {
+                    watching ? (<IconButton onClick={() => {
+                        unwatch(id)
+                        setWatching(false)
+                    }}>
+                        <StarIcon />
+                    </IconButton>) : (<IconButton onClick={() => {
+                        watch(id)
+                        setWatching(true)
+                    }}>
+                        <StarBorderIcon />
+                    </IconButton>)
+                }
+
             </Stack>
             <PackageList
                 project={project}
