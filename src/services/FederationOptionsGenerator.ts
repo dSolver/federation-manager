@@ -1,4 +1,3 @@
-import { map } from 'lodash';
 import { Project } from '../models/Project';
 import { Package } from './../models/Package';
 import { DynamicRemotesGenerator } from './DynamicRemotesGenerator';
@@ -66,13 +65,26 @@ export const FederationsOptionsGenerator = async (proj: Project, pkg: Package) =
 
     const remoteUrls = ${JSON.stringify(stages, null, 2)}
 
-    exports.federationConfig = {
+    federationConfig = {
         name: "${pkg.name}",
         filename: 'remoteEntry.js',
         remotes: ${remotes},
         exposes: ${JSON.stringify(exposes, null, 2)},
         shared: ${shared}
-    }`
+    }
+    
+    if (stage === "prod") {
+        // do not provide override capability
+        federationConfig.remotes = Object.keys(remoteUrls.prod).reduce((s, k)=> {
+            return {
+                ...s,
+                [k]: k+'@'+remoteUrls.prod[k]
+            }
+        }, {})
+    }
+
+    exports.federationConfig = federationConfig;
+    `
 
     // console.log(ret);
     return ret;

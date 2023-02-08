@@ -98,7 +98,7 @@ export const ProjectPage = () => {
                                 setTimeout(() => {
 
                                     editor.trigger('', 'editor.action.formatDocument', 'editor.action.formatDocument')
-                                }, 100)
+                                }, 500)
                             }} key={index} height="50vh" defaultLanguage='javascript' value={_config} />
                         </Paper>
                     ))

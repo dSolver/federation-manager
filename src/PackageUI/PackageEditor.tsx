@@ -71,11 +71,11 @@ export const PackageEditor = (props: { onCreate: (pkg: Package) => void, onCance
     const availableRemotes = props.project.packages.filter(r => r !== pkg.id && !pkg.remotes.includes(r))
 
     return (
-        <Stack spacing={2} data-component="PackageCreator" sx={{marginBottom: 4}}>
+        <Stack spacing={2} data-component="PackageCreator" sx={{ marginBottom: 4 }}>
             {createMode && <h2>Create a Package</h2>}
             {!createMode && <h2>Edit Package</h2>}
 
-            <Paper sx={{padding: 2}}>
+            <Paper sx={{ padding: 2 }}>
                 <Stack spacing={2}>
                     <TextField label="Name"
                         defaultValue={pkg.name}
@@ -251,6 +251,7 @@ export const PackageEditor = (props: { onCreate: (pkg: Package) => void, onCance
                                 if (!pkg.modules.some(m => m.name === newName)) {
                                     setNewModule((_module) => {
                                         return {
+                                            id: '',
                                             name: newName,
                                             path: _module?.path ?? '',
                                             typePath: _module?.typePath
@@ -263,6 +264,7 @@ export const PackageEditor = (props: { onCreate: (pkg: Package) => void, onCance
                                 const newPath = evt.target.value.trim();
                                 setNewModule((_module) => {
                                     return {
+                                        id: '',
                                         name: _module?.name ?? '',
                                         path: newPath,
                                         typePath: _module?.typePath
@@ -272,10 +274,11 @@ export const PackageEditor = (props: { onCreate: (pkg: Package) => void, onCance
 
                             <Button variant="contained" onClick={() => {
                                 if (!isUndefined(newModule)) {
+
                                     setPackage((_pkg) => {
                                         return {
                                             ..._pkg,
-                                            modules: [..._pkg.modules, newModule]
+                                            modules: [..._pkg.modules, { ...newModule, id: uuidv4() }]
                                         }
                                     })
 

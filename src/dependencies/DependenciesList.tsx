@@ -63,7 +63,7 @@ export const DependenciesList = ({ fixedDeps, editableDeps, update }: Dependenci
                 editableDeps.map((dep, index) => {
                     return <ListItem key={index}>
                         <Stack direction="row" spacing={1}>
-                            <TextField label="Dependency Name" error={fixedDeps.some(d => d.name === dep.name)} defaultValue={dep.name} onBlur={(evt) => {
+                            <TextField label="Name" error={fixedDeps.some(d => d.name === dep.name)} defaultValue={dep.name} onBlur={(evt) => {
                                 const newName = evt.target.value.trim()
                                 // name did not change
                                 if (newName === dep.name) {
@@ -87,7 +87,7 @@ export const DependenciesList = ({ fixedDeps, editableDeps, update }: Dependenci
                                     })
                                 ])
                             }} />
-                            <TextField label="Dependency Version" defaultValue={dep.requiredVersion} onBlur={(evt) => {
+                            <TextField label="Version" defaultValue={dep.requiredVersion} onBlur={(evt) => {
                                 let newVersion: string = evt.target.value.trim()
                                 if (newVersion.length === 0) {
                                     return false
@@ -151,7 +151,7 @@ export const DependenciesList = ({ fixedDeps, editableDeps, update }: Dependenci
                     <FormGroup>
                         <h3>Add new dependency</h3>
                         <Stack spacing={1} direction="row">
-                            <TextField label="Dependency Name" inputRef={refs[0]} onBlur={(evt) => {
+                            <TextField label="Name" inputRef={refs[0]} onBlur={(evt) => {
                                 const newName = evt.target.value.trim()
                                 // name did not change
                                 if (newName === newDep.name) {
@@ -170,7 +170,7 @@ export const DependenciesList = ({ fixedDeps, editableDeps, update }: Dependenci
                                     }
                                 })
                             }} />
-                            <TextField label="Dependency Version" inputRef={refs[1]} onBlur={(evt) => {
+                            <TextField label="Version" inputRef={refs[1]} onBlur={(evt) => {
                                 let newVersion: string = evt.target.value.trim()
                                 if (newVersion.length === 0) {
                                     return false
