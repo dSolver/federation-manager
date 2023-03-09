@@ -66,8 +66,6 @@ function extract(program: ts.Program, file: string, imports: string[]): { file: 
 
     ts.forEachChild(sourceFile, handleImports);
 
-    // TODO: generate a report on dependencies, then encode it as base 64, and link to it on the website.
-    // TODO 2: the website should be able to visualize the dependencies
     return {
         file,
         foundImports
@@ -137,6 +135,20 @@ async function extractDirectory(dir: string, packageId: string) {
         })
     })
 
+    function filePathToModuleName(filepath: string) {
+        // check the exportFiles
+        if (exportFiles.includes(filepath)) {
+
+            const exportModule = imports.find(im => im.fileName === filepath)
+            if (exportModule) {
+                return exportModule.moduleName
+            }
+        }
+        return filepath
+    }
+
+
+
     // find all ts, tsx files, and look for import references to known imports
     glob(dir + '/' + '**/*.{ts,tsx}', { ignore: dir + '/**/' + 'node_modules/**' }).then((files) => {
 
@@ -159,16 +171,17 @@ async function extractDirectory(dir: string, packageId: string) {
                         refRemotes[moduleName] = []
                     }
                     const filepath = path.normalize(file)
-                    refRemotes[moduleName].push(filepath)
+                    refRemotes[moduleName].push(filePathToModuleName(filepath))
+
+
                     if (exportFiles.includes(filepath)) {
 
-                        const exportModule = imports.find(im => im.fileName === filepath)
-                        if (exportModule) {
-                            if (!remoteRefs[exportModule.moduleName]) {
-                                remoteRefs[exportModule.moduleName] = []
-                            }
-                            remoteRefs[exportModule.moduleName].push(moduleName)
+                        const exportModuleName = filePathToModuleName(filepath)
+                        if (!remoteRefs[exportModuleName]) {
+                            remoteRefs[exportModuleName] = []
                         }
+                        remoteRefs[exportModuleName].push(moduleName)
+
                     }
                 })
             }
@@ -196,6 +209,5 @@ async function extractDirectory(dir: string, packageId: string) {
 
     })
 }
-
 
 extractDirectory(process.argv[2], process.argv[3])
