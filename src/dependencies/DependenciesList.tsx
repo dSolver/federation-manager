@@ -188,7 +188,7 @@ export const DependenciesList = ({ fixedDeps, editableDeps, update }: Dependenci
                                     }
                                 })
                             }} />
-                            <FormControlLabel control={<Checkbox onChange={(evt) => {
+                            <FormControlLabel control={<Checkbox checked={newDep.eager} onChange={(evt) => {
                                 const checked = evt.target.checked;
                                 setNewDep((dep) => {
                                     return {
@@ -198,7 +198,7 @@ export const DependenciesList = ({ fixedDeps, editableDeps, update }: Dependenci
                                 }) 
                             }} />} label="Eager" />
 
-                            <FormControlLabel control={<Checkbox onChange={(evt) => {
+                            <FormControlLabel control={<Checkbox checked={newDep.singleton} onChange={(evt) => {
                                 const checked = evt.target.checked;
                                 setNewDep((dep) => {
                                     return {
