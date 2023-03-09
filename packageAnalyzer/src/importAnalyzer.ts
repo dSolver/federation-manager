@@ -205,9 +205,32 @@ async function extractDirectory(dir: string, packageId: string) {
             refReport[moduleName].remoteImports = remoteRefs[moduleName]
         })
 
+        const plantuml = generatePlantUML(refReport)
+
         console.log(refReport)
+        console.log(plantuml)
 
     })
+}
+
+function generatePlantUML(report: { [key: string]: { references: string[], remoteImports: string[] } }) {
+
+    let text = ""
+
+    const modules = Object.keys(report)
+
+    text = modules.map(m => `[${m.replaceAll('\\', '/')}]`).join('\n')
+
+    text += '\n'
+    Object.keys(report).forEach((moduleName)=> {
+        report[moduleName].references.forEach((ref)=> {
+            text += `[${moduleName.replaceAll('\\', '/')}] <-- [${ref.replaceAll('\\', '/')}]\n`
+        })
+    })
+
+
+
+    return `@startuml\n${text}\n@enduml`
 }
 
 extractDirectory(process.argv[2], process.argv[3])
