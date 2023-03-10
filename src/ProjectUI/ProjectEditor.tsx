@@ -42,9 +42,9 @@ export const ProjectEditor = (props: { onCreate: (proj: Project) => void, projec
             <h3>Stages</h3>
             <List>
                 {
-                    project.stages.map((stage: string) => {
+                    project.stages.map((stage: string, index: number) => {
                         return (
-                            <ListItem key={stage}>
+                            <ListItem key={index}>
                                 <TextField label="Stage"
                                     defaultValue={stage}
                                     onBlur={(evt) => {
@@ -61,11 +61,24 @@ export const ProjectEditor = (props: { onCreate: (proj: Project) => void, projec
                                         })
                                     }}
                                 />
+                                <Button onClick={() => {
+                                    setProject((_proj) => ({
+                                        ...project,
+                                        stages: project.stages.filter((_s, i) => i !== index)
+                                    }))
+                                }}>Remove</Button>
                             </ListItem>
                         )
                     })
                 }
             </List>
+
+            <Button onClick={() => {
+                setProject((_proj) => ({
+                    ..._proj,
+                    stages: [...project.stages, 'new stage']
+                }))
+            }}>Add Stage</Button>
 
 
             <h3>Shared Dependencies</h3>

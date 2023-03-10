@@ -36,7 +36,8 @@
       "stages": [
         "beta",
         "gamma",
-        "prod"
+        "prod",
+        "local"
       ],
       "shared": [
         {

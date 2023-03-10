@@ -72,17 +72,17 @@ export const ProjectPage = () => {
                                                 return
                                             }
 
-                                            setProject({
+                                            updateProject(project.id, {
                                                 ...project,
                                                 stages: project.stages.map(_s => _s === stage ? evt.target.value : _s)
-                                            })
+                                            }).then(setProject)
                                         }}
                                     />
                                     <Button onClick={() => {
-                                        setProject({
+                                        updateProject(project.id, {
                                             ...project,
                                             stages: project.stages.filter((_s, i) => i !== index)
-                                        })
+                                        }).then(setProject)
                                     }}>Remove</Button>
                                 </ListItem>
                             )
@@ -90,10 +90,10 @@ export const ProjectPage = () => {
                     }
                 </List>
                 <Button onClick={() => {
-                    setProject({
+                    updateProject(project.id, {
                         ...project,
                         stages: [...project.stages, 'new stage']
-                    })
+                    }).then(setProject)
                 }}>Add Stage</Button>
             </Stack>
             <PackageList
