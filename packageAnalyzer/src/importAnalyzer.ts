@@ -88,16 +88,19 @@ function matchStringInNode(sourceFile: ts.SourceFile, node: ts.Node, strs: strin
     return match
 }
 
-async function getExposedModules(packageId: string) {
+async function getExposedModules(projectId: string) {
     let exposedModules: Array<{ path: string, package: string, moduleName: string, fileName: string }> = []
-    const { data } = await axios.get('https://federation-manager.dsolver.ca/api/projects/' + packageId)
+    const { data } = await axios.get('https://federation-manager.dsolver.ca/api/projects/' + projectId)
 
     const { packages } = data as { packages: string[] }
+
+    const packageNames: string[] = []
 
     for (let i = 0; i < packages.length; i++) {
         const resp = await axios.get('https://federation-manager.dsolver.ca/api/packages/' + packages[i])
         const { name, modules } = resp.data as { name: string, modules: Array<{ name: string, path: string }> }
 
+        packageNames.push(name)
         modules.forEach((m) => {
             let moduleName = m.name.trim();
             if (moduleName.startsWith('./')) {
@@ -113,20 +116,58 @@ async function getExposedModules(packageId: string) {
         })
     }
 
-    return exposedModules;
+    return {
+        packages: packageNames,
+        exposedModules
+    }
 }
 
 async function extractDirectory(dir: string, packageId: string) {
 
+    let folders: string[] = []
+    await new Promise((resolve) => {
+
+        fs.readdir(dir, {}, (err, files) => {
+            const _files = files.map(f => f.toString())
+            folders = _files.filter((f: string) => {
+                return fs.lstatSync(path.join(dir, f)).isDirectory()
+            })
+
+            resolve(folders)
+        });
+    })
+    console.log("folders: ", folders)
+
     // identify the list of import modules from the remote config
 
-    const imports = await getExposedModules(packageId)
-    console.log("imports: ", imports)
+    const { exposedModules, packages } = await getExposedModules(packageId)
+    // console.log("Exposed Modules: ", exposedModules)
+
+    const packageDirectories = packages.map((p) => {
+        const potentials = folders.filter(f => f.indexOf(p) >= 0)
+
+
+        if (potentials.length === 0) {
+            console.log("did not find a folder matching " + p)
+            return undefined;
+        }
+
+        potentials.sort((a, b) => {
+            return a.indexOf(p) - b.indexOf(p)
+        })
+        return {
+            package: p,
+            directory: path.join(dir, potentials[0])
+        }
+    })
+
+    console.log('packageDirectories: ', packageDirectories)
 
     // given paths of known packages, assume the package name is the root, find if these files exist
 
+
     const exportFiles: string[] = []
-    imports.forEach((im) => {
+    exposedModules.forEach((im) => {
         console.log("looking for files for " + im.moduleName)
         glob(dir + '/**/' + im.package + '/' + im.path, { ignore: dir + '/**/node_modules/**' }).then((files) => {
             // console.log("Found files: ", files)
@@ -139,10 +180,21 @@ async function extractDirectory(dir: string, packageId: string) {
         // check the exportFiles
         if (exportFiles.includes(filepath)) {
 
-            const exportModule = imports.find(im => im.fileName === filepath)
+            const exportModule = exposedModules.find(im => im.fileName === filepath)
             if (exportModule) {
                 return exportModule.moduleName
             }
+        }
+
+        const pkgDir = packageDirectories.find(dir => {
+            if (dir) {
+                return filepath.startsWith(dir.directory)
+            }
+            return false
+        })
+
+        if (pkgDir) {
+            return filepath.replace(pkgDir.directory, pkgDir.package)
         }
         return filepath
     }
@@ -161,7 +213,7 @@ async function extractDirectory(dir: string, packageId: string) {
         const remoteRefs: { [key: string]: string[] } = {}
         files.forEach((file) => {
             // find the imports using the extract function
-            const fileResults = extract(program, file, imports.map(i => i.moduleName))
+            const fileResults = extract(program, file, exposedModules.map(i => i.moduleName))
 
             if (!isUndefined(fileResults) && fileResults.foundImports.size > 0) {
                 // results[file] = fileResults.foundImports
@@ -180,7 +232,7 @@ async function extractDirectory(dir: string, packageId: string) {
                         if (!remoteRefs[exportModuleName]) {
                             remoteRefs[exportModuleName] = []
                         }
-                        remoteRefs[exportModuleName].push(moduleName)
+                        remoteRefs[exportModuleName].push(filePathToModuleName(moduleName))
 
                     }
                 })
@@ -190,11 +242,25 @@ async function extractDirectory(dir: string, packageId: string) {
 
         const refReport: { [key: string]: { references: string[], remoteImports: string[] } } = {}
 
+
         Object.keys(refRemotes).forEach((moduleName) => {
+            if (!refReport[moduleName]) {
+                refReport[moduleName] = { references: [], remoteImports: [] }
+            }
+
             refReport[moduleName] = {
                 references: refRemotes[moduleName],
                 remoteImports: []
             }
+
+            refRemotes[moduleName].forEach((rm) => {
+                if (!refReport[rm]) {
+                    refReport[rm] = {
+                        references: [], remoteImports: []
+                    }
+                }
+                refReport[rm].remoteImports.push(moduleName)
+            })
         })
 
         Object.keys(remoteRefs).forEach((moduleName) => {
@@ -217,20 +283,34 @@ function generatePlantUML(report: { [key: string]: { references: string[], remot
 
     let text = ""
 
-    const modules = Object.keys(report)
+    const modules = Object.keys(report).map(m => m.replaceAll('\\', '/'))
 
-    text = modules.map(m => `[${m.replaceAll('\\', '/')}]`).join('\n')
+    const packages: { [key: string]: string[] } = {}
+    modules.forEach((m) => {
+        const pkg = m.split('/')[0]
+        if (!packages[pkg]) {
+            packages[pkg] = []
+        }
+        packages[pkg].push(`[${m}]`)
+    })
+
+    text += Object.keys(packages).map((pkgName) => {
+        return `package "${pkgName}" {
+            ${packages[pkgName].join('\n')}
+        }\n`
+    }).join('\n')
+
 
     text += '\n'
-    Object.keys(report).forEach((moduleName)=> {
-        report[moduleName].references.forEach((ref)=> {
-            text += `[${moduleName.replaceAll('\\', '/')}] <-- [${ref.replaceAll('\\', '/')}]\n`
+    Object.keys(report).forEach((moduleName) => {
+        report[moduleName].references.forEach((ref) => {
+            text += `[${moduleName.replaceAll('\\', '/')}]<--[${ref.replaceAll('\\', '/')}]\n`
         })
     })
 
 
 
-    return `@startuml\n${text}\n@enduml`
+    return `@startuml\n${text} \n @enduml`
 }
 
 extractDirectory(process.argv[2], process.argv[3])
