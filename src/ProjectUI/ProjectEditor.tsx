@@ -15,7 +15,7 @@ export const ProjectEditor = (props: { onCreate: (proj: Project) => void, projec
     const defaultProject: Project = {
         id: uuidv4(),
         name: '',
-        stages: ['beta', 'gamma', 'prod'],
+        stages: ['local', 'beta', 'gamma', 'prod'],
         shared: [],
         packages: []
     }

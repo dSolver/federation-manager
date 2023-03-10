@@ -1,6 +1,6 @@
 import { Button, Checkbox, FormControlLabel, FormGroup, List, ListItem, Paper, TextField } from '@mui/material';
 import { Stack } from '@mui/system';
-import { isUndefined, update } from 'lodash';
+import { isUndefined } from 'lodash';
 import React, { useRef, useState } from 'react';
 
 import { Dependency } from '../models/Dependency';

@@ -1,4 +1,4 @@
-import { Button, IconButton, Paper } from '@mui/material'
+import { Button, IconButton, List, ListItem, Paper, TextField } from '@mui/material'
 import { Stack } from '@mui/system'
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
@@ -56,6 +56,45 @@ export const ProjectPage = () => {
                     </IconButton>)
                 }
 
+            </Stack>
+            <Stack>
+                <h3>Stages</h3>
+                <List>
+                    {
+                        project.stages.map((stage: string, index: number) => {
+                            return (
+                                <ListItem key={index}>
+                                    <TextField label="Stage"
+                                        defaultValue={stage}
+                                        onBlur={(evt) => {
+                                            const val = evt.target.value
+                                            if (val.length === 0 || project.stages.some(s => s === val)) {
+                                                return
+                                            }
+
+                                            setProject({
+                                                ...project,
+                                                stages: project.stages.map(_s => _s === stage ? evt.target.value : _s)
+                                            })
+                                        }}
+                                    />
+                                    <Button onClick={() => {
+                                        setProject({
+                                            ...project,
+                                            stages: project.stages.filter((_s, i) => i !== index)
+                                        })
+                                    }}>Remove</Button>
+                                </ListItem>
+                            )
+                        })
+                    }
+                </List>
+                <Button onClick={() => {
+                    setProject({
+                        ...project,
+                        stages: [...project.stages, 'new stage']
+                    })
+                }}>Add Stage</Button>
             </Stack>
             <PackageList
                 project={project}
