@@ -60,7 +60,9 @@ export const FederationsOptionsGenerator = async (proj: Project, pkg: Package) =
 
     const ret = `
     // ${pkg.name} federation.config.js
-    
+
+    const fs = require('fs')
+    const path = require('path')
     const stage = process.env.BUILD_STAGE ?? "beta"
 
     const remoteUrls = ${JSON.stringify(stages, null, 2)}
@@ -83,6 +85,24 @@ export const FederationsOptionsGenerator = async (proj: Project, pkg: Package) =
         }, {})
     }
 
+    if(process.env.DEV_DOMAIN !== undefined) {
+        federationConfig.remotes = Object.keys(federationConfig.remotes).reduce((s, k)=> {
+            return {
+                ...s,
+                [k]: federationConfig.remotes[k].replace("localhost", process.env.DEV_DOMAIN)
+            }
+        }, {})
+    }
+
+    Object.keys(federationConfig.exposes).forEach((k)=> {
+        if(!fs.existsSync(path.resolve(__dirname, federationConfig.exposes[k]))) {
+            console.warn("expose path does not exist: " + path.resolve(__dirname, federationConfig.exposes[k])+" omitting from config")
+            delete federationConfig.exposes[k];
+        }
+    })
+
+
+    
     exports.federationConfig = federationConfig;
     `
 

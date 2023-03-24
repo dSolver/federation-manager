@@ -24,6 +24,9 @@ function extract(program: ts.Program, file: string, imports: string[]): { file: 
         return
     }
 
+    // regex to find import statements in typescript code
+
+
     const handleImports = (node: ts.Node) => {
         if (ts.isImportDeclaration(node)) {
             const moduleSpecifier = node.moduleSpecifier as any
@@ -136,12 +139,10 @@ async function extractDirectory(dir: string, packageId: string) {
             resolve(folders)
         });
     })
-    console.log("folders: ", folders)
 
     // identify the list of import modules from the remote config
 
     const { exposedModules, packages } = await getExposedModules(packageId)
-    // console.log("Exposed Modules: ", exposedModules)
 
     const packageDirectories = packages.map((p) => {
         const potentials = folders.filter(f => f.indexOf(p) >= 0)
@@ -161,16 +162,12 @@ async function extractDirectory(dir: string, packageId: string) {
         }
     })
 
-    console.log('packageDirectories: ', packageDirectories)
-
     // given paths of known packages, assume the package name is the root, find if these files exist
 
 
     const exportFiles: string[] = []
     exposedModules.forEach((im) => {
-        console.log("looking for files for " + im.moduleName)
         glob(dir + '/**/' + im.package + '/' + im.path, { ignore: dir + '/**/node_modules/**' }).then((files) => {
-            // console.log("Found files: ", files)
             exportFiles.push(...files)
             im.fileName = files[0]
         })
@@ -272,6 +269,7 @@ async function extractDirectory(dir: string, packageId: string) {
         })
 
         const plantuml = generatePlantUML(refReport)
+
 
         console.log(refReport)
         console.log(plantuml)

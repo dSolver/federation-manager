@@ -13,6 +13,9 @@ export const PackageList = (props: {
     updatePackages: (packageIds: string[]) => void
 }) => {
     const [packages, setPackages] = useState<Package[]>([])
+    const [toDelete, setToDelete] = useState<Package | undefined>()
+
+    const [openConfirm, setOpenConfirm] = useState(false)
     useEffect(() => {
         if (props.project.packages.length === 0) {
 
@@ -28,6 +31,23 @@ export const PackageList = (props: {
     const [open, setOpen] = useState(false)
     const handleClose = () => {
         setOpen(false)
+    }
+
+    const confirmDelete = (pkg: Package) => {
+        setToDelete(pkg)
+        setOpenConfirm(true)
+    }
+
+    const confirmClose = (del?: boolean) => {
+        if (del && toDelete) {
+            const pkgs = packages.filter(p => p.id !== toDelete.id)
+
+            setPackages(pkgs)
+            props.updatePackages(pkgs.map(p => p.id))
+        }
+
+        setToDelete(undefined)
+        setOpenConfirm(false)
     }
 
     return (
@@ -59,6 +79,7 @@ export const PackageList = (props: {
                                         </TableCell>
                                         <TableCell>
                                             <Button component={Link} to={'packages/' + pkg.id + '/edit'} variant="text" >Edit</Button>
+                                            <Button onClick={() => { confirmDelete(pkg) }} variant="contained">Delete</Button>
                                         </TableCell>
                                     </TableRow>
                                 })
@@ -87,6 +108,20 @@ export const PackageList = (props: {
                             handleClose()
                         }}
                     />
+                </DialogContent>
+            </Dialog>
+            <Dialog open={openConfirm} onClose={() => confirmClose()}>
+                <DialogContent>
+                    <Stack gap={1}>
+                        <div>
+                            Are you sure you want to delete {toDelete?.name}?
+                        </div>
+                        <Stack direction="row" gap={1}>
+                            <Button color='error' onClick={() => confirmClose(true)}>Delete</Button>
+                            <Button color='primary' onClick={() => confirmClose()}>Cancel</Button>
+                        </Stack>
+                    </Stack>
+
                 </DialogContent>
             </Dialog>
         </Stack>
