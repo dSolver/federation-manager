@@ -94,14 +94,6 @@ export const FederationsOptionsGenerator = async (proj: Project, pkg: Package) =
         }, {})
     }
 
-    Object.keys(federationConfig.exposes).forEach((k)=> {
-        if(!fs.existsSync(path.resolve(__dirname, federationConfig.exposes[k]))) {
-            console.warn("expose path does not exist: " + path.resolve(__dirname, federationConfig.exposes[k])+" omitting from config")
-            delete federationConfig.exposes[k];
-        }
-    })
-
-
     
     exports.federationConfig = federationConfig;
     `

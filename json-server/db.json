@@ -209,6 +209,20 @@
         "gamma": "https://gamma-todo-app.toolbelt.io",
         "prod": "https://todo-app.toolbelt.io"
       }
+    },
+    {
+      "id": "1c63af2e-464d-4a5f-9769-aad38cbcbad9",
+      "name": "test",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [],
+      "shared": [],
+      "stages": {
+        "beta": "",
+        "gamma": "",
+        "prod": "",
+        "local": ""
+      }
     }
   ],
   "modules": []
