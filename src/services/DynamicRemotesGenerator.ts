@@ -54,7 +54,7 @@ export const DynamicRemotesGenerator = {
                   }
                   resolve(proxy)
                 }
-                // inject this script with the src set to the versioned remoteEntry.js
+                // inject this script with the src set to the remoteEntry.js
                 document.head.appendChild(script);
               })
               `

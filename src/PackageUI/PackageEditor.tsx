@@ -1,4 +1,4 @@
-import { Box, Chip, ListItemText, Menu, MenuItem, OutlinedInput, Paper, Select, Stack } from '@mui/material';
+import { Alert, ListItemText, Menu, MenuItem, Paper, Stack } from '@mui/material';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -13,31 +13,49 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import { Package } from '../models/Package';
 import { Project } from '../models/Project';
-import { PackageName } from './PackageName';
 import { getPackage } from '../services/package.service';
 import { ExposedModule } from '../models/ExposedModule';
 import { DependenciesList } from '../dependencies/DependenciesList';
 import { Dependency } from '../models/Dependency';
 
+
+const defaultPackage = (): Package => ({
+    id: uuidv4(),
+    name: '',
+    version: '0.0.1',
+    modules: [],
+    remotes: [],
+    shared: [],
+    stages: {}
+})
+
+function acceptableProtocol(url: string) {
+    return url.toLowerCase().startsWith('http://') || url.toLowerCase().startsWith('https://') || url.toLowerCase().startsWith('file://')
+}
+
+function initStageUrls(pkg: Package) {
+    const stageUrls: { [key: string]: string } = {}
+    if (pkg.stages) {
+        Object.keys(pkg.stages).forEach(stage => {
+            const val = pkg.stages[stage]
+            if (val && !acceptableProtocol(val)) {
+                stageUrls[stage] = `//${val}`
+            } else {
+                stageUrls[stage] = val;
+            }
+        })
+    }
+
+    pkg.stages = stageUrls
+    return pkg
+}
+
 export const PackageEditor = (props: { onCreate: (pkg: Package) => void, onCancel: () => void, package?: Package, project: Project }) => {
 
-    const defaultPackage: Package = {
-        id: uuidv4(),
-        name: '',
-        version: '0.0.1',
-        modules: [],
-        remotes: [],
-        shared: [],
-        stages: {}
-    }
-
-    if (props.project.stages) {
-        props.project.stages.forEach(s => defaultPackage.stages[s] = '')
-    }
 
     const createMode = isUndefined(props.package)
 
-    const [pkg, setPackage] = useState<Package>(cloneDeep(props.package) ?? defaultPackage)
+    const [pkg, setPackage] = useState<Package>(cloneDeep(initStageUrls(props.package ?? defaultPackage())))
 
     const [pkgNames, setPkgNames] = useState<{ [pkgId: string]: string }>({})
 
@@ -45,6 +63,11 @@ export const PackageEditor = (props: { onCreate: (pkg: Package) => void, onCance
 
     const [remoteAnchorEl, setRemoteAnchorEl] = React.useState<null | HTMLElement>(null);
 
+    const [devPort, setDevPort] = useState<number | undefined>(pkg.devPort)
+
+    const [stageUrls, setStageUrls] = useState<{ [stage: string]: string }>(pkg.stages)
+
+    const [invalidStageUrls, setInvalidStageUrls] = useState<{ [stage: string]: boolean }>({})
     const open = Boolean(remoteAnchorEl);
 
     const newModuleInputRefs = [useRef<HTMLInputElement>(), useRef<HTMLInputElement>()]
@@ -70,6 +93,14 @@ export const PackageEditor = (props: { onCreate: (pkg: Package) => void, onCance
 
     const availableRemotes = props.project.packages.filter(r => r !== pkg.id && !pkg.remotes.includes(r))
 
+    let localPortWarning = false;
+    if (pkg.stages.local && pkg.devPort) {
+        const localUrl = new URL(pkg.stages.local)
+        const localPort = localUrl.port
+        if (localPort !== pkg.devPort.toString()) {
+            localPortWarning = true;
+        }
+    }
     return (
         <Stack spacing={2} data-component="PackageCreator" sx={{ marginBottom: 4 }}>
             {createMode && <h2>Create a Package</h2>}
@@ -88,6 +119,40 @@ export const PackageEditor = (props: { onCreate: (pkg: Package) => void, onCance
                             })
                         }} />
 
+                    <TextField label="Local Development Port" value={devPort}
+                        onChange={(evt) => {
+                            const port = parseInt(evt.target.value)
+                            if (!isNaN(port)) {
+                                setDevPort(port)
+                            }
+                        }}
+                        onBlur={(evt) => {
+                            const port = parseInt(evt.target.value)
+                            if (!isNaN(port)) {
+                                setPackage((_pkg) => {
+                                    return {
+                                        ..._pkg,
+                                        devPort: port
+                                    }
+                                })
+                            }
+                        }} />
+                    {localPortWarning && <Alert severity="error" action={<Button color="inherit" size="small" onClick={() => {
+                        const localUrl = new URL(pkg.stages.local)
+                        const localPort = localUrl.port;
+                        const port = parseInt(localPort)
+                        console.log(localUrl, localPort, port)
+                        if (!isNaN(port)) {
+                            setDevPort(port)
+
+                            setPackage((_pkg) => {
+                                return {
+                                    ..._pkg,
+                                    devPort: port
+                                }
+                            })
+                        }
+                    }}>Fix Dev Port to match URL</Button>}>The development port and local stage does not match</Alert>}
                     <div>
                         <h3>URLs</h3>
                         <Stack spacing={2}>
@@ -98,17 +163,53 @@ export const PackageEditor = (props: { onCreate: (pkg: Package) => void, onCance
                                             key={stage}>
                                             <TextField
                                                 label={stage}
-                                                defaultValue={pkg.stages[stage]}
-                                                onBlur={(evt) => {
-                                                    setPackage((_pkg) => {
+                                                value={stageUrls[stage] ?? ''}
+                                                error={invalidStageUrls[stage]}
+                                                helperText={invalidStageUrls[stage] && 'Invalid URL. URL must start with http://, https:// or file://'}
+                                                onChange={(evt) => {
+                                                    let val = evt.target.value;
+                                                    setStageUrls((_urls) => {
                                                         return {
-                                                            ..._pkg,
-                                                            stages: {
-                                                                ..._pkg.stages,
-                                                                [stage]: evt.target.value
-                                                            }
+                                                            ..._urls,
+                                                            [stage]: val
                                                         }
                                                     })
+
+
+                                                }}
+                                                onBlur={(evt) => {
+
+                                                    try {
+                                                        const url = new URL(evt.target.value)
+                                                        console.log(url)
+                                                        if (url.protocol !== 'file:' && url.protocol !== 'http:' && url.protocol !== 'https:') {
+                                                            throw new Error('invalid protocol')
+                                                        }
+                                                        setPackage((_pkg) => {
+                                                            return {
+                                                                ..._pkg,
+                                                                stages: {
+                                                                    ..._pkg.stages,
+                                                                    [stage]: evt.target.value
+                                                                }
+                                                            }
+                                                        })
+                                                        setInvalidStageUrls((_invalid) => {
+                                                            return {
+                                                                ..._invalid,
+                                                                [stage]: false
+                                                            }
+                                                        })
+                                                    } catch (e) {
+                                                        console.error('invalid url: ', evt.target.value)
+                                                        setInvalidStageUrls((_invalid) => {
+                                                            return {
+                                                                ..._invalid,
+                                                                [stage]: true
+                                                            }
+                                                        })
+                                                    }
+
 
                                                 }}
                                             />
@@ -117,6 +218,27 @@ export const PackageEditor = (props: { onCreate: (pkg: Package) => void, onCance
                                 })
                             }
                         </Stack>
+                        {localPortWarning && <Alert severity="error" action={<Button color="inherit" size="small" onClick={() => {
+                            const localUrl = new URL(pkg.stages.local)
+
+                            localUrl.port = pkg.devPort!.toString()
+
+                            setStageUrls((_urls) => {
+                                return {
+                                    ..._urls,
+                                    local: localUrl.toString()
+                                }
+                            })
+                            setPackage((_pkg) => {
+                                return {
+                                    ..._pkg,
+                                    stages: {
+                                        ..._pkg.stages,
+                                        local: localUrl.toString()
+                                    }
+                                }
+                            })
+                        }}>Fix Dev Port to match URL</Button>}>The development port and local stage does not match</Alert>}
                     </div>
                     <div>
                         <h3>Remotes (dependencies of this package)</h3>
@@ -239,6 +361,14 @@ export const PackageEditor = (props: { onCreate: (pkg: Package) => void, onCance
                                                     })
                                                 }
                                             }} />
+                                            <Button onClick={() => {
+                                                setPackage((_pkg) => {
+                                                    return {
+                                                        ..._pkg,
+                                                        modules: _pkg.modules.filter(m => m.name !== _module.name)
+                                                    }
+                                                })
+                                            }}>Remove</Button>
                                         </Stack>
                                     </ListItem>
                                 ))

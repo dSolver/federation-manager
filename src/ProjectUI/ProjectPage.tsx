@@ -142,9 +142,7 @@ export const ProjectPage = () => {
                         </Paper>
                     ))
                 }
-
             </Stack>
-
         </Stack>
     )
 }

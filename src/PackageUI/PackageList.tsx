@@ -4,7 +4,7 @@ import { Link, redirect } from 'react-router-dom'
 import { Package } from '../models/Package'
 import { Project } from '../models/Project'
 import { ProjectEditor } from '../ProjectUI/ProjectEditor'
-import { createPackage, getPackages } from '../services/package.service'
+import { createPackage, getPackages, updatePackage } from '../services/package.service'
 import { createProject, getProjects } from '../services/project.service'
 import { PackageEditor } from './PackageEditor'
 
@@ -38,12 +38,20 @@ export const PackageList = (props: {
         setOpenConfirm(true)
     }
 
+    // close the dialog and delete the package if the user confirms
     const confirmClose = (del?: boolean) => {
         if (del && toDelete) {
             const pkgs = packages.filter(p => p.id !== toDelete.id)
 
-            setPackages(pkgs)
-            props.updatePackages(pkgs.map(p => p.id))
+            // for each package, if it has a dependency on the package to delete, remove the dependency
+            const toUpdate = pkgs.filter(pkg => pkg.remotes.some(d => d === toDelete.id))
+
+            Promise.all(toUpdate.map(pkg => updatePackage(pkg.id, pkg))).then(() => {
+
+                setPackages(pkgs)
+                props.updatePackages(pkgs.map(p => p.id))
+            })
+
         }
 
         setToDelete(undefined)
@@ -59,8 +67,8 @@ export const PackageList = (props: {
                         <TableHead>
                             <TableRow>
                                 <TableCell>Name</TableCell>
-                                <TableCell>Version</TableCell>
-                                <TableCell>Number of Modules</TableCell>
+                                <TableCell>Dev Port</TableCell>
+                                <TableCell># of Exposed Modules</TableCell>
                                 <TableCell>Action</TableCell>
                             </TableRow>
                         </TableHead>
@@ -72,7 +80,7 @@ export const PackageList = (props: {
                                             <Link to={'packages/' + pkg.id}>{pkg.name}</Link>
                                         </TableCell>
                                         <TableCell>
-                                            {pkg.version}
+                                            {pkg.devPort}
                                         </TableCell>
                                         <TableCell>
                                             {pkg.modules.length}
@@ -94,20 +102,25 @@ export const PackageList = (props: {
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle></DialogTitle>
                 <DialogContent>
-                    <PackageEditor
-                        project={props.project}
-                        onCreate={(newPackage: Package) => {
-                            handleClose()
+                    {
+                        open && (
+                            <PackageEditor
+                                project={props.project}
+                                onCreate={(newPackage: Package) => {
+                                    handleClose()
 
-                            createPackage(newPackage)
-                                .then(() => {
-                                    props.updatePackages([...packages.map(p => p.id), newPackage.id])
-                                })
-                        }}
-                        onCancel={() => {
-                            handleClose()
-                        }}
-                    />
+                                    createPackage(newPackage)
+                                        .then(() => {
+                                            props.updatePackages([...packages.map(p => p.id), newPackage.id])
+                                        })
+                                }}
+                                onCancel={() => {
+                                    handleClose()
+                                }}
+                            />
+                        )
+                    }
+
                 </DialogContent>
             </Dialog>
             <Dialog open={openConfirm} onClose={() => confirmClose()}>

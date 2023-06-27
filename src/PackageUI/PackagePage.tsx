@@ -78,9 +78,7 @@ export const PackagePage = () => {
                             pkg.remotes.map((pkgId: string) => (
                                 <ListItem key={pkgId} >
                                     <ListItemButton component={Link} to={'../' + pkgId} relative={'path'}>
-                                        {
-                                            pkgNames[pkgId]
-                                        }
+                                        {pkgNames[pkgId]}
                                     </ListItemButton>
                                 </ListItem>
                             ))

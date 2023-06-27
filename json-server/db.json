@@ -58,6 +58,39 @@
         "aa6daa8d-525d-4a9d-9d7a-5751c1e08b58",
         "317ae5fd-bede-46c8-8555-e11b4ea1ceba"
       ]
+    },
+    {
+      "id": "005516a8-0f72-4706-89a5-c14dfb673eba",
+      "name": "test",
+      "stages": [
+        "local",
+        "beta",
+        "gamma",
+        "prod"
+      ],
+      "shared": [],
+      "packages": [
+        "950e9bed-c0d6-4314-9f16-53141e3be172",
+        "31320864-ba86-482b-a487-96542fc63bf4",
+        "0cef5530-50e4-49db-a44f-247d96090986"
+      ]
+    },
+    {
+      "id": "4b63290f-d548-4dca-9a1f-693cbe36b90f",
+      "name": "Toolbelt",
+      "stages": [
+        "local",
+        "beta",
+        "gamma",
+        "prod"
+      ],
+      "shared": [],
+      "packages": [
+        "044fdaca-4a9a-450b-9341-c9038fb27249",
+        "caf1fff0-3441-4b8b-ad85-10ea9396de75",
+        "122bbe93-42d2-4e2f-94e3-96189069a164",
+        "38ea825a-2041-4676-8e7d-dbf60921d66c"
+      ]
     }
   ],
   "packages": [
@@ -163,8 +196,10 @@
       "stages": {
         "beta": "https://localhost:8080",
         "gamma": "https://gamma.toolbelt.io",
-        "prod": "https://toolbelt.io"
-      }
+        "prod": "https://toolbelt.io",
+        "local": "http://localhost:3000/"
+      },
+      "devPort": 3000
     },
     {
       "id": "aa6daa8d-525d-4a9d-9d7a-5751c1e08b58",
@@ -187,8 +222,10 @@
       "stages": {
         "beta": "http://localhost:8082",
         "gamma": "https://gamma-todo-notification.toolbelt.io",
-        "prod": "https://todo-notification.toolbelt.io"
-      }
+        "prod": "https://todo-notification.toolbelt.io",
+        "local": "http://localhost:8082"
+      },
+      "devPort": 8082
     },
     {
       "id": "317ae5fd-bede-46c8-8555-e11b4ea1ceba",
@@ -201,14 +238,17 @@
         }
       ],
       "remotes": [
-        "aa6daa8d-525d-4a9d-9d7a-5751c1e08b58"
+        "aa6daa8d-525d-4a9d-9d7a-5751c1e08b58",
+        "9c240c05-837d-4202-867c-b13ce608293b"
       ],
       "shared": [],
       "stages": {
         "beta": "http://localhost:8081",
         "gamma": "https://gamma-todo-app.toolbelt.io",
-        "prod": "https://todo-app.toolbelt.io"
-      }
+        "prod": "https://todo-app.toolbelt.io",
+        "local": "http://localhost:8081"
+      },
+      "devPort": 8081
     },
     {
       "id": "1c63af2e-464d-4a5f-9769-aad38cbcbad9",
@@ -223,6 +263,107 @@
         "prod": "",
         "local": ""
       }
+    },
+    {
+      "id": "950e9bed-c0d6-4314-9f16-53141e3be172",
+      "name": "abc",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [],
+      "shared": [],
+      "stages": {}
+    },
+    {
+      "id": "31320864-ba86-482b-a487-96542fc63bf4",
+      "name": "def",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [],
+      "shared": [],
+      "stages": {}
+    },
+    {
+      "id": "0cef5530-50e4-49db-a44f-247d96090986",
+      "name": "ggda",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [],
+      "shared": [],
+      "stages": {}
+    },
+    {
+      "id": "9c240c05-837d-4202-867c-b13ce608293b",
+      "name": "test",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [],
+      "shared": [],
+      "stages": {},
+      "devPort": 1234
+    },
+    {
+      "id": "044fdaca-4a9a-450b-9341-c9038fb27249",
+      "name": "host",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [
+        "caf1fff0-3441-4b8b-ad85-10ea9396de75",
+        "122bbe93-42d2-4e2f-94e3-96189069a164",
+        "38ea825a-2041-4676-8e7d-dbf60921d66c"
+      ],
+      "shared": [],
+      "stages": {
+        "local": "http://localhost:4000",
+        "beta": "http://localhost:4000",
+        "gamma": "http://localhost:4000",
+        "prod": "http://localhost:4000"
+      },
+      "devPort": 4000
+    },
+    {
+      "id": "caf1fff0-3441-4b8b-ad85-10ea9396de75",
+      "name": "Todo",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [],
+      "shared": [],
+      "stages": {
+        "local": "http://localhost:4001",
+        "beta": "http://localhost:4001",
+        "gamma": "http://localhost:4001",
+        "prod": "http://localhost:4001"
+      },
+      "devPort": 4001
+    },
+    {
+      "id": "122bbe93-42d2-4e2f-94e3-96189069a164",
+      "name": "Notifier",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [],
+      "shared": [],
+      "stages": {
+        "local": "http://localhost:4002",
+        "beta": "http://localhost:4002",
+        "gamma": "http://localhost:4002",
+        "prod": "http://localhost:4002"
+      },
+      "devPort": 4002
+    },
+    {
+      "id": "38ea825a-2041-4676-8e7d-dbf60921d66c",
+      "name": "Chat",
+      "version": "0.0.1",
+      "modules": [],
+      "remotes": [],
+      "shared": [],
+      "stages": {
+        "local": "http://localhost:4003",
+        "beta": "http://localhost:4003",
+        "gamma": "http://localhost:4003",
+        "prod": "http://localhost:4003"
+      },
+      "devPort": 4003
     }
   ],
   "modules": []

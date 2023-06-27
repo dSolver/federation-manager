@@ -3,9 +3,7 @@ import { Project } from '../models/Project'
 import { createProject, getProjects } from '../services/project.service'
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { ProjectEditor } from './ProjectEditor';
 import { Paper, TableBody, TableContainer } from '@mui/material';

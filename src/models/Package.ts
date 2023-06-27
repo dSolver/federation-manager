@@ -11,4 +11,5 @@ export type Package = {
     modules: ExposedModule[]; // what will be exposed
     remotes: string[]; // what will be imported, array of strings representing package ids
     shared: Dependency[];
+    devPort?: number;
 }
