@@ -1,6 +1,5 @@
 import { Project } from '../models/Project';
 import { Package } from './../models/Package';
-import { DynamicRemotesGenerator } from './DynamicRemotesGenerator';
 import { getPackage } from './package.service';
 
 
@@ -22,7 +21,7 @@ export const FederationsOptionsGenerator = async (proj: Project, pkg: Package) =
             stages[stage][_pkg.name] = [_pkg.stages[stage], 'remoteEntry.js'].join('/')
         })
 
-        promises[_pkg.name] = `dynamicRemote('${_pkg.name}', remoteUrls[stage]['${_pkg.name}'])`
+        promises[_pkg.name] = `dynamicRemote('${_pkg.name}', stage !== 'prod')`
     }
 
     const exposes: { [key: string]: string } = {}
@@ -35,15 +34,6 @@ export const FederationsOptionsGenerator = async (proj: Project, pkg: Package) =
     JSON.stringify(stages, null, 2)
 
     let remotes = promises;
-
-    // const matches = remotes.match(/(["])(?:(?=(\\?))\2.)*?\1/gm)
-    // matches?.forEach((m) => {
-    //     if (m.includes('\\n')) {
-    //         remotes = remotes.replace(m, m.replaceAll('"', '`'))
-    //     }
-    // })
-
-    // remotes = remotes.replaceAll('\\n', '\n')
 
     const shared = JSON.stringify([...proj.shared, ...pkg.shared].reduce((s, dep) => {
         return {
@@ -81,16 +71,6 @@ export const FederationsOptionsGenerator = async (proj: Project, pkg: Package) =
         },
         exposes: ${JSON.stringify(exposes, null, 2)},
         shared: ${shared}
-    }
-    
-    if (stage === "prod") {
-        // do not provide override capability
-        federationConfig.remotes = Object.keys(remoteUrls.prod).reduce((s, k)=> {
-            return {
-                ...s,
-                [k]: k+'@'+remoteUrls.prod[k]
-            }
-        }, {})
     }
 
     if(process.env.DEV_DOMAIN !== undefined) {
